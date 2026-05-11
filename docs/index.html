@@ -758,8 +758,10 @@
     <div class="matrix-bg"></div>
 
     <!-- AI Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="assets/js/ai-libs.js"></script>
     <script src="assets/js/enhanced-ui.js"></script>
+    <script src="assets/js/3d-engine.js"></script>
 
     <script>
         // Export file using AI Export Manager
@@ -1112,7 +1114,7 @@
             }
         }
 
-        function selectDesign(id) {
+        async function selectDesign(id) {
             // Remove previous selection
             document.querySelectorAll('.design-card').forEach(card => {
                 card.classList.remove('ring-4', 'ring-blue-500');
@@ -1124,12 +1126,86 @@
                 selectedCard.classList.add('ring-4', 'ring-blue-500');
             }
 
-            showNotification(`${id}. tasarım seçildi`, 'info');
+            UI.notify(`${id}. tasarım seçildi`, 'info');
 
-            // Auto redirect to rendering page after selection
-            setTimeout(() => {
-                showPage('rendering');
-            }, 1000);
+            // Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loadingIndicator.innerHTML = `
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-cube text-4xl text-blue-400 mb-4 animate-spin"></i>
+                    <p>3D Model Oluşturuluyor...</p>
+                </div>
+            `;
+            document.body.appendChild(loadingIndicator);
+
+            try {
+                // Get design data and create 3D model
+                const designData = await getDesignData(id);
+                const threeJS = ThreeJS.getViewer();
+
+                if (threeJS && designData) {
+                    // Create 3D model from design
+                    threeJS.createModelFromPlan(designData);
+
+                    // Wait for model to be created
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                // Remove loading indicator
+                document.body.removeChild(loadingIndicator);
+
+                // Auto redirect to rendering page after model creation
+                setTimeout(() => {
+                    showPage('rendering');
+                }, 500);
+
+            } catch (error) {
+                UI.notify('3D model oluşturulamadı', 'error');
+                if (loadingIndicator && loadingIndicator.parentElement) {
+                    document.body.removeChild(loadingIndicator);
+                }
+            }
+        }
+
+        // Get design data (simulate API call)
+        async function getDesignData(designId) {
+            const designs = {
+                '1': {
+                    id: '1',
+                    style: 'modern',
+                    totalArea: 85,
+                    rooms: [
+                        { name: 'Salon', area: 45, type: 'living' },
+                        { name: 'Yatak Odası', area: 25, type: 'bedroom' },
+                        { name: 'Mutfak', area: 15, type: 'kitchen' }
+                    ],
+                    recommendations: ['Açık plan tasarım', 'Doğal ışık optimizasyonu']
+                },
+                '2': {
+                    id: '2',
+                    style: 'classic',
+                    totalArea: 92,
+                    rooms: [
+                        { name: 'Salon', area: 35, type: 'living' },
+                        { name: 'Yatak Odası', area: 30, type: 'bedroom' },
+                        { name: 'Mutfak', area: 27, type: 'kitchen' }
+                    ],
+                    recommendations: ['Odalara ayrımlık', 'Klasik detaylar']
+                },
+                '3': {
+                    id: '3',
+                    style: 'industrial',
+                    totalArea: 78,
+                    rooms: [
+                        { name: 'Açık Alan', area: 50, type: 'living' },
+                        { name: 'İş Odası', area: 28, type: 'office' }
+                    ],
+                    recommendations: ['Endüstriyel malzemeler', 'Büyük pencereler']
+                }
+            };
+
+            return designs[designId] || designs['1'];
         }
 
         async function startRender() {
@@ -1148,21 +1224,48 @@
                 document.querySelector('.neon-button')
             );
 
-            // Use AI Render Engine
+            // Use AI Render Engine and 3D Engine
             try {
-                const renderResult = await Render.render3D({
-                    model: 'selected-design',
-                    quality: quality,
-                    lighting: lighting
-                }, {
-                    quality: quality,
-                    format: 'png'
-                });
+                // Update 3D viewer settings
+                const threeJS = ThreeJS.getViewer();
+                if (threeJS) {
+                    threeJS.setQualityLevel(quality);
+                    threeJS.setLightingPreset(lighting);
+                }
 
-                // Update progress
-                for (let i = 0; i <= 100; i += 5) {
-                    UI.updateProgress('render-progress', i, `Render ${i}% - ${quality.toUpperCase()}`);
+                // Update progress with phases
+                for (let i = 0; i <= 30; i += 5) {
+                    UI.updateProgress('render-progress', i, `3D Model Hazırlanıyor ${i}%`);
                     await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                for (let i = 30; i <= 70; i += 5) {
+                    UI.updateProgress('render-progress', i, `Işıklandırma Ayarlanıyor ${i}%`);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                for (let i = 70; i <= 100; i += 5) {
+                    UI.updateProgress('render-progress', i, `Renderlanıyor ${i}%`);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                // Render from 3D engine
+                let renderResult;
+                if (threeJS) {
+                    renderResult = await threeJS.renderToImage({
+                        quality: quality,
+                        format: 'png'
+                    });
+                } else {
+                    // Fallback to AI render engine
+                    renderResult = await Render.render3D({
+                        model: 'selected-design',
+                        quality: quality,
+                        lighting: lighting
+                    }, {
+                        quality: quality,
+                        format: 'png'
+                    });
                 }
 
                 // Clean up progress
