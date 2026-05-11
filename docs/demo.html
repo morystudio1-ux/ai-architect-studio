@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Architect Design Studio - Demo with Real Design Plan</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <style>
+        body {
+            background: #0f172a;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .design-preview {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #designImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Background -->
+    <div class="matrix-bg"></div>
+
+    <!-- AI Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="assets/js/ai-libs.js"></script>
+    <script src="assets/js/enhanced-ui.js"></script>
+    <script src="assets/js/3d-engine.js"></script>
+
+    <div class="demo-container">
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center mb-4 gradient-text-animated">
+                AI Architect Design Studio - Gerçek Tasarım Plan Demo
+            </h1>
+            <p class="text-gray-300 text-center mb-6">
+                C:\Users\Ai-Lab\Desktop\OTOMASYON\TASARIM PLAN.png dosyasını analiz ederek AI ile 3D tasarım oluşturuyoruz
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Upload Section -->
+            <section class="mb-8">
+                <div class="design-preview">
+                    <h2 class="text-2xl font-bold mb-4">Gerçek Tasarım Plan Yükle</h2>
+
+                    <!-- Image Preview -->
+                    <div class="mb-6">
+                        <img id="designImage" src="file:///C:/Users/Ai-Lab/Desktop/OTOMASYON/TASARIM PLAN.png"
+                             alt="Tasarım Plan"
+                             class="w-full">
+                    </div>
+
+                    <!-- Analysis Button -->
+                    <div class="text-center">
+                        <button onclick="analyzeRealDesign()"
+                                class="neon-button px-8 py-4 rounded-full text-white font-semibold text-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all">
+                            <i class="fas fa-magic mr-2"></i> AI ile Analiz Et
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Results -->
+            <section id="analysisSection" class="hidden">
+                <div class="design-preview mb-8">
+                    <h2 class="text-2xl font-bold mb-4">AI Analiz Sonuçları</h2>
+
+                    <!-- Metrics Grid -->
+                    <div class="grid md:grid-cols-4 gap-6 mb-8">
+                        <div class="metric-card">
+                            <i class="fas fa-ruler-combined text-blue-400 text-3xl mb-2"></i>
+                            <div class="text-3xl font-bold" id="totalArea">0m²</div>
+                            <div class="text-gray-400">Toplam Alan</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <i class="fas fa-door-open text-purple-400 text-3xl mb-2"></i>
+                            <div class="text-3xl font-bold" id="roomCount">0</div>
+                            <div class="text-gray-400">Oda Sayısı</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <i class="fas fa-lightbulb text-yellow-400 text-3xl mb-2"></i>
+                            <div class="text-3xl font-bold" id="lightScore">0%</div>
+                            <div class="text-gray-400">Işık Skoru</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <i class="fas fa-leaf text-green-400 text-3xl mb-2"></i>
+                            <div class="text-3xl font-bold" id="sustainability">A</div>
+                            <div class="text-gray-400">Sürdürülebilirlik</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bars -->
+                    <div class="space-y-4 mb-8">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Işık Verimliliği</span>
+                                <span id="lightPercent">0%</span>
+                            </div>
+                            <div class="bg-gray-700 rounded-full h-3">
+                                <div id="lightBar" class="bg-blue-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Alan Optimizasyonu</span>
+                                <span id="spacePercent">0%</span>
+                            </div>
+                            <div class="bg-gray-700 rounded-full h-3">
+                                <div id="spaceBar" class="bg-purple-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Enerji Verimliliği</span>
+                                <span id="energyPercent">0%</span>
+                            </div>
+                            <div class="bg-gray-700 rounded-full h-3">
+                                <div id="energyBar" class="bg-green-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Design Variations -->
+            <section id="variationsSection" class="hidden">
+                <div class="design-preview mb-8">
+                    <h2 class="text-2xl font-bold mb-6">AI ile Oluşturulan Tasarım Varyasyonları</h2>
+
+                    <div class="grid md:grid-cols-3 gap-6" id="variationsGrid">
+                        <!-- Variations will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3D Viewer -->
+            <section id="viewerSection" class="hidden">
+                <div class="design-preview">
+                    <h2 class="text-2xl font-bold mb-4">3D Model Görüntüleyici</h2>
+
+                    <div class="viewer-container h-96 mb-8 relative" id="demo3dViewer">
+                        <canvas id="demo3dCanvas" class="absolute inset-0 w-full h-full"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="text-center">
+                                <i class="fas fa-cube text-6xl text-blue-400 mb-4 animate-pulse"></i>
+                                <p class="text-xl">3D Model Hazırlanıyor...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Render Controls -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <button onclick="startDemoRender()" class="neon-button px-6 py-3 rounded-full text-white font-semibold">
+                            <i class="fas fa-play mr-2"></i> Render Başlat
+                        </button>
+                        <button onclick="shareDemo()" class="glass-card px-6 py-3 rounded-full text-white font-semibold hover:shadow-lg transition">
+                            <i class="fas fa-share-alt mr-2"></i> Paylaş
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Notification -->
+        <div id="notification" class="notification">
+            <div class="flex items-start">
+                <i id="notificationIcon" class="fas fa-check-circle text-2xl mr-3 mt-1"></i>
+                <div>
+                    <h4 id="notificationTitle" class="font-semibold mb-1">Başarılı!</h4>
+                    <p id="notificationMessage" class="text-sm">İşlem tamamlandı</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize UI Systems
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize 3D viewer
+            const viewer3D = new ThreeJSEngine('demo3dViewer');
+        });
+
+        // Analyze real design plan
+        async function analyzeRealDesign() {
+            UI.notify('Tasarım planı AI ile analiz ediliyor...', 'info');
+
+            // Create progress
+            const progressContainer = UI.progress('demo-analysis', {
+                label: 'AI Analizi - %s'
+            });
+            document.querySelector('.design-preview').appendChild(progressContainer);
+
+            try {
+                // Simulate AI analysis of the real design
+                const analysisData = await simulateAIAnalysis();
+
+                // Update progress
+                for (let i = 0; i <= 100; i += 10) {
+                    UI.updateProgress('demo-analysis', i, `AI Analizi ${i}%`);
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+
+                // Clean up progress
+                UI.removeProgress('demo-analysis');
+
+                // Show analysis results
+                displayAnalysisResults(analysisData);
+
+                // Load design variations
+                await loadDesignVariations(analysisData);
+
+                UI.notify('AI analizi tamamlandı!', 'success');
+
+            } catch (error) {
+                UI.notify('Analiz sırasında hata oluştu', 'error');
+            }
+        }
+
+        // Simulate AI analysis
+        async function simulateAIAnalysis() {
+            // In a real implementation, this would send the image to an AI service
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        totalArea: 125,
+                        roomCount: 5,
+                        lightScore: 85,
+                        sustainability: 'A',
+                        efficiency: 92,
+                        energyEfficiency: 88,
+                        style: 'modern',
+                        rooms: [
+                            { name: 'Salon', area: 45, type: 'living' },
+                            { name: 'Yatak Odası 1', area: 18, type: 'bedroom' },
+                            { name: 'Yatak Odası 2', area: 15, type: 'bedroom' },
+                            { name: 'Mutfak', area: 20, type: 'kitchen' },
+                            { name: 'Banyo', area: 12, type: 'bathroom' },
+                            { name: 'Hol', area: 15, type: 'hall' }
+                        ],
+                        recommendations: [
+                            'Merdiven tasarımı optimize edilebilir',
+                            'Doğal ışık için büyük pencereler eklenebilir',
+                            'Açık plan tasarım ile alan daha geniş hissedilebilir'
+                        ]
+                    });
+                }, 3000);
+            });
+        }
+
+        // Display analysis results
+        function displayAnalysisResults(data) {
+            // Show analysis section
+            document.getElementById('analysisSection').classList.remove('hidden');
+
+            // Animate metrics
+            animateValue('totalArea', 0, data.totalArea, 'm²');
+            animateValue('roomCount', 0, data.roomCount, '');
+            animateValue('lightScore', 0, data.lightScore, '%');
+
+            // Animate progress bars
+            setTimeout(() => {
+                updateProgressBar('lightBar', 'lightPercent', data.lightScore);
+                updateProgressBar('spaceBar', 'spacePercent', data.efficiency);
+                updateProgressBar('energyBar', 'energyPercent', data.energyEfficiency);
+            }, 500);
+        }
+
+        // Animate number values
+        function animateValue(id, start, end, suffix) {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const increment = (end - start) / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.round(current) + suffix;
+            }, 16);
+        }
+
+        // Update progress bar
+        function updateProgressBar(barId, percentId, value) {
+            const bar = document.getElementById(barId);
+            const percent = document.getElementById(percentId);
+
+            bar.style.width = value + '%';
+            setTimeout(() => {
+                percent.textContent = value + '%';
+            }, 100);
+        }
+
+        // Load design variations
+        async function loadDesignVariations(data) {
+            const variations = [
+                {
+                    id: 'var_1',
+                    name: 'Modern Minimalist',
+                    style: 'bg-gradient-to-br from-blue-500 to-purple-500',
+                    score: 95,
+                    features: ['Açık Plan', 'Temiz Hatlar', 'Doğal Işık'],
+                    preview: 'https://picsum.photos/seed/modern-min/400/300'
+                },
+                {
+                    id: 'var_2',
+                    name: 'Classic Elegance',
+                    style: 'bg-gradient-to-br from-purple-500 to-pink-500',
+                    score: 88,
+                    features: ['Klasik Detaylar', 'Zengin Malzemeler', 'Sıcak Renkler'],
+                    preview: 'https://picsum.photos/seed/classic-el/400/300'
+                },
+                {
+                    id: 'var_3',
+                    name: 'Futuristic Smart',
+                    style: 'bg-gradient-to-br from-gray-500 to-blue-500',
+                    score: 92,
+                    features: ['Akıllı Ev', 'Teknoloji Entegrasyonu', 'Sürdürülebilir'],
+                    preview: 'https://picsum.photos/seed/futuristic-smart/400/300'
+                }
+            ];
+
+            const container = document.getElementById('variationsGrid');
+            container.innerHTML = variations.map(variation => `
+                <div class="glass-card p-6 hover:scale-105 transition-transform cursor-pointer"
+                     onclick="selectVariation('${variation.id}')"
+                     data-animate="fade-up">
+                    <div class="w-full h-40 ${variation.style} rounded-lg mb-4 flex items-center justify-center">
+                        <img src="${variation.preview}" alt="${variation.name}"
+                             class="w-full h-full object-cover rounded-lg">
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">${variation.name}</h4>
+                    <p class="text-2xl font-bold text-blue-400 mb-3">${variation.score}%</p>
+                    <div class="space-y-1">
+                        ${variation.features.map(feature => `
+                            <div class="flex items-center text-sm text-gray-400">
+                                <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                ${feature}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Show variations section
+            document.getElementById('variationsSection').classList.remove('hidden');
+
+            // Trigger animations
+            setTimeout(() => {
+                container.querySelectorAll('[data-animate]').forEach(el => {
+                    UI.animate(el);
+                });
+            }, 100);
+        }
+
+        // Select variation and create 3D model
+        function selectVariation(id) {
+            UI.notify(`${id}. tasarım seçildi, 3D model oluşturuluyor...`, 'info');
+
+            // Show viewer section
+            document.getElementById('viewerSection').classList.remove('hidden');
+
+            // Create 3D model
+            setTimeout(() => {
+                const threeJS = ThreeJS.getViewer();
+                if (threeJS) {
+                    // Create floor plan based on analysis
+                    threeJS.createBasicFloorPlan(15, 12);
+                    UI.notify('3D model hazır!', 'success');
+                }
+            }, 1500);
+        }
+
+        // Start demo render
+        async function startDemoRender() {
+            UI.notify('Render işlemi başlatılıyor...', 'info');
+
+            // Get quality settings
+            const quality = 'ultra';
+            const lighting = 'natural';
+
+            // Create progress
+            const progressContainer = UI.progress('demo-render', {
+                label: `Render ${quality.toUpperCase()} - %s`
+            });
+            document.querySelector('.flex.flex-wrap.gap-4.justify-center').insertBefore(
+                progressContainer,
+                event.target.parentElement
+            );
+
+            try {
+                // Update 3D viewer settings
+                const threeJS = ThreeJS.getViewer();
+                if (threeJS) {
+                    threeJS.setQualityLevel(quality);
+                    threeJS.setLightingPreset(lighting);
+                }
+
+                // Simulate rendering
+                for (let i = 0; i <= 100; i += 5) {
+                    UI.updateProgress('demo-render', i, `Renderlanıyor ${i}%`);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                // Clean up
+                UI.removeProgress('demo-render');
+
+                // Create and download render
+                const renderResult = await threeJS.renderToImage({
+                    quality: quality,
+                    format: 'png'
+                });
+
+                // Download image
+                const link = document.createElement('a');
+                link.href = renderResult.url;
+                link.download = `ai-architect-render-${Date.now()}.png`;
+                link.click();
+
+                UI.notify('Render tamamlandı ve indirildi!', 'success');
+
+            } catch (error) {
+                UI.notify('Render işlemi başarısız oldu', 'error');
+            }
+        }
+
+        // Share demo
+        async function shareDemo() {
+            const shareText = 'AI Architect Design Studio ile gerçek tasarım planımı 3D\'e dönüştürdüm!';
+            const shareUrl = window.location.href;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'AI Architect Design Studio',
+                        text: shareText,
+                        url: shareUrl
+                    });
+                    UI.notify('Paylaşıldı!', 'success');
+                } catch (error) {
+                    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                    UI.notify('Link kopyalandı!', 'success');
+                }
+            } else {
+                await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                UI.notify('Link kopyalandı!', 'success');
+            }
+        }
+    </script>
+</body>
+</html>
