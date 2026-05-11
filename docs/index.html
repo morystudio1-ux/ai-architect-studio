@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Architect Design Studio - Premium Edition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #7c3aed;
+            --accent: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Gradient Backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #ec4899 100%);
+        }
+
+        .dark-gradient {
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+        }
+
+        @keyframes slide-in {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Components */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .neon-button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .neon-button::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .neon-button:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .metric-card:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* Loading States */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Floating Elements */
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Navigation */
+        .nav-item {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after,
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* Upload Area */
+        .upload-zone {
+            border: 2px dashed rgba(59, 130, 246, 0.5);
+            border-radius: 20px;
+            background: rgba(30, 41, 59, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.6s ease;
+        }
+
+        .upload-zone:hover::before {
+            transform: scale(1);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(245, 158, 11, 0.1);
+            transform: scale(1.02);
+        }
+
+        /* 3D Viewer */
+        .viewer-container {
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viewer-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Progress Ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            stroke-dasharray: 251.2 251.2;
+            stroke-dashoffset: 251.2;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 30px;
+            backdrop-filter: blur(10px);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-gradient {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark-gradient">
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 floating"></div>
+        <div class="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 floating" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-20 left-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 floating" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-cube text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        AI Architect Studio
+                    </h1>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="nav-item active text-gray-300 hover:text-white transition">Ana Sayfa</a>
+                    <a href="#design" class="nav-item text-gray-300 hover:text-white transition">Tasarım</a>
+                    <a href="#rendering" class="nav-item text-gray-300 hover:text-white transition">Render</a>
+                    <a href="#analytics" class="nav-item text-gray-300 hover:text-white transition">Analiz</a>
+                    <a href="#export" class="nav-item text-gray-300 hover:text-white transition">Export</a>
+                </div>
+                <button class="md:hidden text-white">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="hero-gradient text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent">
+                        Mimarlıkta AI Devrimi
+                    </h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+                        Yapay zeka gücünü kullanarak, 2D planlarınızdan lüks 3D modeller,
+                        gerçekçi renderlar ve profesyonel çıktılar oluşturun
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="showPage('design')" class="neon-button px-8 py-4 rounded-full text-white font-semibold text-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all">
+                            <i class="fas fa-magic mr-2"></i> Tasarım Başlat
+                        </button>
+                        <button onclick="showPage('rendering')" class="glass-card px-8 py-4 rounded-full text-white font-semibold text-lg hover:shadow-lg transition-all">
+                            <i class="fas fa-eye mr-2"></i> Render incele
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="feature-card text-center group">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-brain text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Generative Design</h3>
+                        <p class="text-gray-400 text-sm">Yapay zeka ile tasarım varyasyonları oluşturun</p>
+                    </div>
+
+                    <div class="feature-card text-center group">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-cube text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">3D Modelleme</h3>
+                        <p class="text-gray-400 text-sm">Gerçek zamanlı 3D model oluşturma</p>
+                    </div>
+
+                    <div class="feature-card text-center group">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-paint-brush text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Ultra Render</h3>
+                        <p class="text-gray-400 text-sm">Sinema kalitesinde render çıktıları</p>
+                    </div>
+
+                    <div class="feature-card text-center group">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fas fa-chart-line text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Akıllı Analiz</h3>
+                        <p class="text-gray-400 text-sm">Performans ve maliyet optimizasyonu</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Design Section -->
+        <section id="design" class="py-20 hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Akıllı Tasarım</h2>
+                    <p class="text-xl text-gray-300">Planınızdan AI ile tasarım varyasyonları oluşturun</p>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="max-w-4xl mx-auto mb-12">
+                    <div class="upload-zone p-12 text-center cursor-pointer" id="uploadZone">
+                        <i class="fas fa-cloud-upload-alt text-6xl text-blue-400 mb-6"></i>
+                        <h3 class="text-2xl font-semibold mb-2">Planınızı Sürükleyin veya Bırakın</h3>
+                        <p class="text-gray-400 mb-4">veya tıklayarak dosya seçin</p>
+                        <p class="text-sm text-gray-500">PDF, JPG, PNG • Maks 10MB • AI ile analiz</p>
+                        <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+
+                    <div id="selectedFile" class="hidden mt-6 p-6 bg-slate-800 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-lg font-semibold">Seçilen Dosya</h4>
+                                <p id="fileName" class="text-gray-400"></p>
+                            </div>
+                            <button onclick="analyzePlan()" class="neon-button px-6 py-3 rounded-full text-white font-semibold">
+                                <i class="fas fa-magic mr-2"></i> AI ile Analiz Et
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Results -->
+                <div id="aiAnalysis" class="hidden">
+                    <div class="grid md:grid-cols-3 gap-6 mb-12">
+                        <div class="metric-card">
+                            <div class="text-4xl font-bold text-blue-400 mb-2" data-metric="light">0%</div>
+                            <div class="text-gray-400">Işık Verimliliği</div>
+                            <div class="mt-4 text-sm">
+                                <div class="bg-gray-700 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="text-4xl font-bold text-purple-400 mb-2" data-metric="space">0%</div>
+                            <div class="text-gray-400">Alan Optimizasyonu</div>
+                            <div class="mt-4 text-sm">
+                                <div class="bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="text-4xl font-bold text-green-400 mb-2" data-metric="energy">0%</div>
+                            <div class="text-gray-400">Enerji Sınıfı</div>
+                            <div class="mt-4 text-sm">
+                                <div class="bg-gray-700 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Design Variations -->
+                    <div class="mb-12">
+                        <h3 class="text-2xl font-bold mb-6">Tasarım Varyasyonları</h3>
+                        <div class="grid md:grid-cols-3 gap-6" id="designVariations">
+                            <!-- Variations will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="processing" class="hidden text-center py-20">
+                    <div class="inline-block">
+                        <div class="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+                        <h3 class="text-2xl font-semibold mb-2">AI Çalışıyor...</h3>
+                        <p class="text-gray-400">Planınız analiz ediliyor ve tasarım varyasyonları oluşturuluyor</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rendering Section -->
+        <section id="rendering" class="py-20 hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Ultra Render</h2>
+                    <p class="text-xl text-gray-300">Sinema kalitesinde render çıktıları</p>
+                </div>
+
+                <div class="max-w-6xl mx-auto">
+                    <!-- 3D Viewer -->
+                    <div class="viewer-container h-96 mb-8 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-cube text-6xl text-blue-400 mb-4 animate-pulse"></i>
+                                <p class="text-xl">3D Model Görüntüleyici</p>
+                            </div>
+                        </div>
+
+                        <!-- View Controls -->
+                        <div class="viewer-controls">
+                            <button class="text-white hover:text-blue-400 transition">
+                                <i class="fas fa-home"></i>
+                            </button>
+                            <button class="text-white hover:text-blue-400 transition">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="text-white hover:text-blue-400 transition">
+                                <i class="fas fa-cube"></i>
+                            </button>
+                            <button class="text-white hover:text-blue-400 transition">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Render Options -->
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-semibold mb-4">Kalite Ayarları</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between">
+                                    <span>Draft</span>
+                                    <input type="radio" name="quality" value="draft" class="text-blue-500">
+                                </label>
+                                <label class="flex items-center justify-between">
+                                    <span>Standard</span>
+                                    <input type="radio" name="quality" value="standard" class="text-blue-500" checked>
+                                </label>
+                                <label class="flex items-center justify-between">
+                                    <span>High</span>
+                                    <input type="radio" name="quality" value="high" class="text-blue-500">
+                                </label>
+                                <label class="flex items-center justify-between">
+                                    <span>Ultra</span>
+                                    <input type="radio" name="quality" value="ultra" class="text-blue-500">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-6">
+                            <h3 class="text-xl font-semibold mb-4">Aydınlatma</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between">
+                                    <span>Doğal Işık</span>
+                                    <input type="radio" name="lighting" value="natural" class="text-blue-500" checked>
+                                </label>
+                                <label class="flex items-center justify-between">
+                                    <span>Gece</span>
+                                    <input type="radio" name="lighting" value="night" class="text-blue-500">
+                                </label>
+                                <label class="flex items-center justify-between">
+                                    <span>Stüdyo</span>
+                                    <input type="radio" name="lighting" value="studio" class="text-blue-500">
+                                </label>
+                                <label class="flex items-center justify-between">
+                                    <span>Özel</span>
+                                    <input type="radio" name="lighting" value="custom" class="text-blue-500">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Render Controls -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <button onclick="startRender()" class="neon-button px-6 py-3 rounded-full text-white font-semibold">
+                            <i class="fas fa-play mr-2"></i> Render Başlat
+                        </button>
+                        <button class="glass-card px-6 py-3 rounded-full text-white font-semibold hover:shadow-lg transition">
+                            <i class="fas fa-palette mr-2"></i> Malzeme Seç
+                        </button>
+                        <button class="glass-card px-6 py-3 rounded-full text-white font-semibold hover:shadow-lg transition">
+                            <i class="fas fa-video mr-2"></i> Video Oluştur
+                        </button>
+                        <button class="glass-card px-6 py-3 rounded-full text-white font-semibold hover:shadow-lg transition">
+                            <i class="fas fa-vr-cardboard mr-2"></i> VR/AR İndir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="py-20 hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Akıllı Analiz</h2>
+                    <p class="text-xl text-gray-300">Performans, maliyet ve sürdürülebilirlik</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="metric-card">
+                        <i class="fas fa-leaf text-green-400 text-3xl mb-2"></i>
+                        <div class="text-2xl font-bold">A+</div>
+                        <div class="text-gray-400">Sürdürülebilirlik</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <i class="fas fa-dollar-sign text-green-400 text-3xl mb-2"></i>
+                        <div class="text-2xl font-bold">-15%</div>
+                        <div class="text-gray-400">Maliyet Tasarrufu</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <i class="fas fa-bolt text-yellow-400 text-3xl mb-2"></i>
+                        <div class="text-2xl font-bold">95%</div>
+                        <div class="text-gray-400">Verimlilik</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <i class="fas fa-check-circle text-green-400 text-3xl mb-2"></i>
+                        <div class="text-2xl font-bold">0</div>
+                        <div class="text-gray-400">Kural İhlali</div>
+                    </div>
+                </div>
+
+                <!-- Compliance Check -->
+                <div class="glass-card p-8 mb-8">
+                    <h3 class="text-2xl font-semibold mb-6">Kontrol Listesi</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-green-500/20 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                                <span>Bina Yüksekliği Standardı</span>
+                            </div>
+                            <span class="text-green-400">Uygun</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-yellow-500/20 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-yellow-400 mr-3"></i>
+                                <span>Havalandırma</span>
+                            </div>
+                            <span class="text-yellow-400">İyileştirme Gerekli</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-green-500/20 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                                <span>Yangın Güvenliği</span>
+                            </div>
+                            <span class="text-green-400">Uygun</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="glass-card p-8">
+                    <h3 class="text-2xl font-semibold mb-6">AI Tavsiyeleri</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-blue-500/20 rounded-lg">
+                            <h4 class="font-semibold mb-2">Işık Optimizasyonu</h4>
+                            <p class="text-gray-300 text-sm">Gün batımı saatlerinde doğal ışığı %30 artırmak için büyük pencere ekleyin.</p>
+                        </div>
+                        <div class="p-4 bg-purple-500/20 rounded-lg">
+                            <h4 class="font-semibold mb-2">Enerji Tasarrufu</h4>
+                            <p class="text-gray-300 text-sm">Çift cam pencereler yıllık %20 enerji tasarrufu sağlayacak.</p>
+                        </div>
+                        <div class="p-4 bg-green-500/20 rounded-lg">
+                            <h4 class="font-semibold mb-2">Malzeme Optimizasyonu</h4>
+                            <p class="text-gray-300 text-sm">Sürdürülebilir ahşap kullanım ile karbon ayak izini %15 azaltın.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Export Section -->
+        <section id="export" class="py-20 hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Çıktılar</h2>
+                    <p class="text-xl text-gray-300">Profesyonel çıktılar için çeşitli formatlar</p>
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 text-center hover:scale-105 transition-transform">
+                            <i class="fas fa-image text-5xl text-blue-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Ultra Render</h3>
+                            <p class="text-gray-400 mb-4">8K profesyonel render çıktıları</p>
+                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                                İndir (PNG/JPG)
+                            </button>
+                        </div>
+
+                        <div class="glass-card p-6 text-center hover:scale-105 transition-transform">
+                            <i class="fas fa-cube text-5xl text-purple-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">3D Model</h3>
+                            <p class="text-gray-400 mb-4">Uyumlu 3D formatları</p>
+                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                                İndir (GLTF/OBJ)
+                            </button>
+                        </div>
+
+                        <div class="glass-card p-6 text-center hover:scale-105 transition-transform">
+                            <i class="fas fa-video text-5xl text-pink-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Video Walkthrough</h3>
+                            <p class="text-gray-400 mb-4">4K dolaşım videoları</p>
+                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                                İndir (MP4)
+                            </button>
+                        </div>
+
+                        <div class="glass-card p-6 text-center hover:scale-105 transition-transform">
+                            <i class="fas fa-vr-cardboard text-5xl text-orange-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">VR/AR</h3>
+                            <p class="text-gray-400 mb-4">Sanal gerçeklik deneyimi</p>
+                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                                İndir (VRML/USDZ)
+                            </button>
+                        </div>
+
+                        <div class="glass-card p-6 text-center hover:scale-105 transition-transform">
+                            <i class="fas fa-file-pdf text-5xl text-red-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Teknik Doküman</h3>
+                            <p class="text-gray-400 mb-4">Detaylı raporlar</p>
+                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                                İndir (PDF)
+                            </button>
+                        </div>
+
+                        <div class="glass-card p-6 text-center hover:scale-105 transition-transform">
+                            <i class="fas fa-share-alt text-5xl text-green-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2">Paylaş</h3>
+                            <p class="text-gray-400 mb-4">İnternet üzerinden paylaş</p>
+                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                                Online Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="flex items-start">
+            <i id="notificationIcon" class="fas fa-check-circle text-2xl mr-3 mt-1"></i>
+            <div>
+                <h4 id="notificationTitle" class="font-semibold mb-1">Başarılı!</h4>
+                <p id="notificationMessage" class="text-sm">İşlem tamamlandı</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all sections
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(pageId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+
+                // Smooth scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Trigger animations
+            setTimeout(() => {
+                targetSection.querySelectorAll('.glass-card, .feature-card').forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    }, index * 100);
+                });
+            }, 100);
+        }
+
+        // File Upload Handling
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+            const maxSize = 10 * 1024 * 1024;
+
+            if (!file) {
+                showNotification('Lütfen bir dosya seçin', 'error');
+                return;
+            }
+
+            if (!allowedTypes.includes(file.type)) {
+                showNotification('Desteklenmeyen dosya formatı. JPG, PNG veya PDF bekleniyor', 'error');
+                return;
+            }
+
+            if (file.size > maxSize) {
+                showNotification('Dosya boyutu 10MB\'den büyük olamaz', 'error');
+                return;
+            }
+
+            const fileNameEl = document.getElementById('fileName');
+            if (fileNameEl) {
+                fileNameEl.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            }
+
+            const selectedFileEl = document.getElementById('selectedFile');
+            if (selectedFileEl) {
+                selectedFileEl.classList.remove('hidden');
+            }
+
+            // Scroll to selected file
+            selectedFileEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function analyzePlan() {
+            const selectedFileEl = document.getElementById('selectedFile');
+            const processingEl = document.getElementById('processing');
+            const aiAnalysisEl = document.getElementById('aiAnalysis');
+
+            if (selectedFileEl) selectedFileEl.classList.add('hidden');
+            if (processingEl) processingEl.classList.remove('hidden');
+
+            // Simulate AI analysis with realistic progress
+            let progress = 0;
+            const progressBar = setInterval(() => {
+                progress += 10;
+                if (progress >= 100) {
+                    clearInterval(progressBar);
+                    if (processingEl) processingEl.classList.add('hidden');
+                    if (aiAnalysisEl) aiAnalysisEl.classList.remove('hidden');
+
+                    // Animate metrics
+                    animateMetrics();
+
+                    // Load design variations
+                    loadDesignVariations();
+
+                    showNotification('AI analizi tamamlandı! Tasarım varyasyonları oluşturuldu', 'success');
+
+                    // Scroll to results
+                    setTimeout(() => {
+                        aiAnalysisEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function animateMetrics() {
+            const metrics = [
+                { selector: '[data-metric="light"]', value: 87 },
+                { selector: '[data-metric="space"]', value: 92 },
+                { selector: '[data-metric="energy"]', value: 95 }
+            ];
+
+            metrics.forEach(metric => {
+                const element = document.querySelector(metric.selector);
+                if (element) {
+                    let current = 0;
+                    const increment = metric.value / 20;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= metric.value) {
+                            current = metric.value;
+                            clearInterval(timer);
+                        }
+                        element.textContent = Math.round(current) + '%';
+                    }, 50);
+                }
+            });
+        }
+
+        function loadDesignVariations() {
+            const variations = [
+                {
+                    id: '1',
+                    name: 'Modern Minimal',
+                    style: 'bg-gradient-to-br from-blue-500 to-purple-500',
+                    score: 95,
+                    efficiency: 92,
+                    light: 88,
+                    utilisation: 95
+                },
+                {
+                    id: '2',
+                    name: 'Klasik Elegance',
+                    style: 'bg-gradient-to-br from-purple-500 to-pink-500',
+                    score: 88,
+                    efficiency: 85,
+                    light: 90,
+                    utilisation: 92
+                },
+                {
+                    id: '3',
+                    name: 'Endüstriyel Chic',
+                    style: 'bg-gradient-to-br from-gray-500 to-orange-500',
+                    score: 85,
+                    efficiency: 80,
+                    light: 95,
+                    utilisation: 88
+                }
+            ];
+
+            const container = document.getElementById('designVariations');
+            if (container) {
+                container.innerHTML = variations.map(variation => `
+                    <div class="glass-card p-6 hover:scale-105 transition-transform cursor-pointer design-card" data-design-id="${variation.id}" onclick="selectDesign('${variation.id}')">
+                        <div class="w-full h-40 ${variation.style} rounded-lg mb-4 flex items-center justify-center">
+                            <i class="fas fa-home text-6xl text-white"></i>
+                        </div>
+                        <h4 class="text-lg font-semibold mb-2">${variation.name}</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Toplam Puan</span>
+                                <span class="font-semibold text-blue-400">${variation.score}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Verimlilik</span>
+                                <span class="font-semibold text-purple-400">${variation.efficiency}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Işık</span>
+                                <span class="font-semibold text-yellow-400">${variation.light}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Kullanım</span>
+                                <span class="font-semibold text-green-400">${variation.utilisation}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add entrance animation
+                container.querySelectorAll('.design-card').forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    }, index * 200);
+                });
+            }
+        }
+
+        function selectDesign(id) {
+            // Remove previous selection
+            document.querySelectorAll('.design-card').forEach(card => {
+                card.classList.remove('ring-4', 'ring-blue-500');
+            });
+
+            // Highlight selected design
+            const selectedCard = document.querySelector(`[data-design-id="${id}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('ring-4', 'ring-blue-500');
+            }
+
+            showNotification(`${id}. tasarım seçildi`, 'info');
+
+            // Auto redirect to rendering page after selection
+            setTimeout(() => {
+                showPage('rendering');
+            }, 1000);
+        }
+
+        function startRender() {
+            // Get selected quality and lighting
+            const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
+            const lighting = document.querySelector('input[name="lighting"]:checked')?.value || 'natural';
+
+            showNotification(`${quality.toUpperCase()} kalite ile render başlatılıyor...`, 'info');
+
+            // Show loading state
+            const renderButton = event.target;
+            const originalText = renderButton.innerHTML;
+            renderButton.disabled = true;
+            renderButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Çalışıyor...';
+
+            // Simulate render process
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    renderButton.disabled = false;
+                    renderButton.innerHTML = originalText;
+
+                    showNotification('Render tamamlandı! Çıktılar bölümünden indirebilirsiniz', 'success');
+
+                    // Auto redirect to export page
+                    setTimeout(() => {
+                        showPage('export');
+                    }, 1500);
+                }
+            }, 100);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const title = document.getElementById('notificationTitle');
+            const messageEl = document.getElementById('notificationMessage');
+
+            // Set icon and color
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle text-2xl mr-3 mt-1 text-green-400';
+                notification.className = 'notification success show';
+                title.textContent = 'Başarılı!';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle text-2xl mr-3 mt-1 text-red-400';
+                notification.className = 'notification error show';
+                title.textContent = 'Hata!';
+            } else {
+                icon.className = 'fas fa-info-circle text-2xl mr-3 mt-1 text-blue-400';
+                notification.className = 'notification info show';
+                title.textContent = 'Bilgi';
+            }
+
+            messageEl.textContent = message;
+
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Add intersection observer for animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            // Observe all sections
+            document.querySelectorAll('section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
