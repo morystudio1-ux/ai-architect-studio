@@ -4,7 +4,8 @@ AI destekli mimari tasarım platformu. 2D planlarınızdan lüks 3D modeller, ge
 
 ## 🚀 Hızlı Başlangıç
 
-Site URL: https://morystudio1-ux.github.io/ai-architect-studio/
+### Ana Site: https://morystudio1-ux.github.io/ai-architect-studio/
+### Demo Sayfası: https://morystudio1-ux.github.io/ai-architect-studio/demo.html
 
 ## 🌟 Özellikler
 
