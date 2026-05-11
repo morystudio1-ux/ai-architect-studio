@@ -6,6 +6,7 @@
     <title>AI Architect Design Studio - Premium Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
     <style>
         :root {
             --primary: #1e40af;
@@ -307,6 +308,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/css/custom.css">
 </head>
 <body class="dark-gradient">
     <!-- Floating Background Elements -->
@@ -497,8 +499,9 @@
 
                 <div class="max-w-6xl mx-auto">
                     <!-- 3D Viewer -->
-                    <div class="viewer-container h-96 mb-8 relative">
-                        <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="viewer-container h-96 mb-8 relative" id="model3dViewer">
+                        <canvas id="3dCanvas" class="absolute inset-0 w-full h-full"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                             <div class="text-center">
                                 <i class="fas fa-cube text-6xl text-blue-400 mb-4 animate-pulse"></i>
                                 <p class="text-xl">3D Model Görüntüleyici</p>
@@ -685,7 +688,7 @@
                             <i class="fas fa-image text-5xl text-blue-400 mb-4"></i>
                             <h3 class="text-xl font-semibold mb-2">Ultra Render</h3>
                             <p class="text-gray-400 mb-4">8K profesyonel render çıktıları</p>
-                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                            <button class="neon-button px-4 py-2 rounded-full text-sm ripple" onclick="exportFile('render')">
                                 İndir (PNG/JPG)
                             </button>
                         </div>
@@ -694,7 +697,7 @@
                             <i class="fas fa-cube text-5xl text-purple-400 mb-4"></i>
                             <h3 class="text-xl font-semibold mb-2">3D Model</h3>
                             <p class="text-gray-400 mb-4">Uyumlu 3D formatları</p>
-                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                            <button class="neon-button px-4 py-2 rounded-full text-sm ripple" onclick="exportFile('model')">
                                 İndir (GLTF/OBJ)
                             </button>
                         </div>
@@ -703,7 +706,7 @@
                             <i class="fas fa-video text-5xl text-pink-400 mb-4"></i>
                             <h3 class="text-xl font-semibold mb-2">Video Walkthrough</h3>
                             <p class="text-gray-400 mb-4">4K dolaşım videoları</p>
-                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                            <button class="neon-button px-4 py-2 rounded-full text-sm ripple" onclick="exportFile('video')">
                                 İndir (MP4)
                             </button>
                         </div>
@@ -712,7 +715,7 @@
                             <i class="fas fa-vr-cardboard text-5xl text-orange-400 mb-4"></i>
                             <h3 class="text-xl font-semibold mb-2">VR/AR</h3>
                             <p class="text-gray-400 mb-4">Sanal gerçeklik deneyimi</p>
-                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                            <button class="neon-button px-4 py-2 rounded-full text-sm ripple" onclick="exportFile('vr')">
                                 İndir (VRML/USDZ)
                             </button>
                         </div>
@@ -721,7 +724,7 @@
                             <i class="fas fa-file-pdf text-5xl text-red-400 mb-4"></i>
                             <h3 class="text-xl font-semibold mb-2">Teknik Doküman</h3>
                             <p class="text-gray-400 mb-4">Detaylı raporlar</p>
-                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                            <button class="neon-button px-4 py-2 rounded-full text-sm ripple" onclick="exportFile('pdf')">
                                 İndir (PDF)
                             </button>
                         </div>
@@ -730,7 +733,7 @@
                             <i class="fas fa-share-alt text-5xl text-green-400 mb-4"></i>
                             <h3 class="text-xl font-semibold mb-2">Paylaş</h3>
                             <p class="text-gray-400 mb-4">İnternet üzerinden paylaş</p>
-                            <button class="neon-button px-4 py-2 rounded-full text-sm">
+                            <button class="neon-button px-4 py-2 rounded-full text-sm ripple" onclick="shareProject()">
                                 Online Link
                             </button>
                         </div>
@@ -751,7 +754,103 @@
         </div>
     </div>
 
+    <!-- Matrix Rain Background -->
+    <div class="matrix-bg"></div>
+
+    <!-- AI Libraries -->
+    <script src="assets/js/ai-libs.js"></script>
+    <script src="assets/js/enhanced-ui.js"></script>
+
     <script>
+        // Export file using AI Export Manager
+        async function exportFile(type) {
+            const formats = {
+                render: { format: 'png', label: 'Ultra Render' },
+                model: { format: 'gltf', label: '3D Model' },
+                video: { format: 'mp4', label: 'Video Walkthrough' },
+                vr: { format: 'usdz', label: 'VR/AR Experience' },
+                pdf: { format: 'pdf', label: 'Technical Document' }
+            };
+
+            const exportType = formats[type];
+            if (!exportType) return;
+
+            UI.notify(`${exportType.label} export ediliyor...`, 'info');
+
+            try {
+                const exportResult = await Export.save(exportType.format, {
+                    type: type,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Simulate download progress
+                for (let i = 0; i <= 100; i += 10) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                // Create download link
+                const link = document.createElement('a');
+                link.href = exportResult.downloadUrl;
+                link.download = `ai-architect-${type}-${Date.now()}.${exportType.format}`;
+                link.click();
+
+                UI.notify(`${exportType.label} başarıyla indirildi!`, 'success');
+            } catch (error) {
+                UI.notify('Export işlemi başarısız oldu', 'error');
+            }
+        }
+
+        // Share project
+        async function shareProject() {
+            const shareUrl = window.location.href;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'AI Architect Design Studio',
+                        text: 'Kendi mimari tasarımım oluşturdum!',
+                        url: shareUrl
+                    });
+                    UI.notify('Proje başarıyla paylaşıldı!', 'success');
+                } catch (error) {
+                    // Fallback: copy to clipboard
+                    await navigator.clipboard.writeText(shareUrl);
+                    UI.notify('Link kopyalandı!', 'success');
+                }
+            } else {
+                // Fallback: copy to clipboard
+                await navigator.clipboard.writeText(shareUrl);
+                UI.notify('Link kopyalandı!', 'success');
+            }
+        }
+
+        // Initialize UI Systems
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize particle background
+            window.particleBg = window.particleBg || {};
+
+            // Initialize model viewers
+            document.querySelectorAll('.viewer-container').forEach(container => {
+                new ModelViewer3D(container);
+            });
+
+            // Add animations to elements
+            document.querySelectorAll('[data-animate]').forEach(el => {
+                el.style.opacity = '0';
+                switch(el.dataset.animate) {
+                    case 'fade-up':
+                        el.style.transform = 'translateY(30px)';
+                        break;
+                    case 'slide-left':
+                        el.style.transform = 'translateX(-50px)';
+                        break;
+                    case 'scale-in':
+                        el.style.transform = 'scale(0.8)';
+                        break;
+                }
+            });
+        });
+
         // Page Navigation
         function showPage(pageId) {
             // Hide all sections
@@ -851,27 +950,59 @@
             selectedFileEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function analyzePlan() {
+        async function analyzePlan() {
             const selectedFileEl = document.getElementById('selectedFile');
             const processingEl = document.getElementById('processing');
             const aiAnalysisEl = document.getElementById('aiAnalysis');
+            const fileInput = document.getElementById('fileInput');
+
+            if (!fileInput.files[0]) {
+                UI.notify('Lütfen bir dosya seçin', 'error');
+                return;
+            }
 
             if (selectedFileEl) selectedFileEl.classList.add('hidden');
             if (processingEl) processingEl.classList.remove('hidden');
 
-            // Simulate AI analysis with realistic progress
-            let progress = 0;
-            const progressBar = setInterval(() => {
-                progress += 10;
-                if (progress >= 100) {
-                    clearInterval(progressBar);
-                    if (processingEl) processingEl.classList.add('hidden');
-                    if (aiAnalysisEl) aiAnalysisEl.classList.remove('hidden');
+            // Create AI analysis progress
+            const progressContainer = UI.progress('ai-analysis', {
+                label: 'AI Analizi - %s'
+            });
+            processingEl.appendChild(progressContainer);
 
-                    // Animate metrics
-                    animateMetrics();
+            try {
+                // Use AI Service for analysis
+                const analysisResult = await AI.analyze(fileInput.files[0]);
 
-                    // Load design variations
+                // Update progress
+                for (let i = 0; i <= 100; i += 10) {
+                    UI.updateProgress('ai-analysis', i, `AI Analizi ${i}%`);
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+
+                // Clean up progress
+                UI.removeProgress('ai-analysis');
+                if (processingEl) processingEl.classList.add('hidden');
+                if (aiAnalysisEl) aiAnalysisEl.classList.remove('hidden');
+
+                // Update metrics with AI results
+                updateMetricsWithAI(analysisResult);
+
+                // Load AI-generated design variations
+                await loadDesignVariationsAI(analysisResult);
+
+                UI.notify('AI analizi tamamlandı! Tasarım varyasyonları oluşturuldu', 'success');
+
+                // Scroll to results
+                setTimeout(() => {
+                    aiAnalysisEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+
+            } catch (error) {
+                UI.notify('AI analizi sırasında hata oluştu', 'error');
+                UI.removeProgress('ai-analysis');
+            }
+        }
                     loadDesignVariations();
 
                     showNotification('AI analizi tamamlandı! Tasarım varyasyonları oluşturuldu', 'success');
@@ -1001,27 +1132,55 @@
             }, 1000);
         }
 
-        function startRender() {
+        async function startRender() {
             // Get selected quality and lighting
             const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
             const lighting = document.querySelector('input[name="lighting"]:checked')?.value || 'natural';
 
-            showNotification(`${quality.toUpperCase()} kalite ile render başlatılıyor...`, 'info');
+            UI.notify(`${quality.toUpperCase()} kalite ile render başlatılıyor...`, 'info');
 
-            // Show loading state
-            const renderButton = event.target;
-            const originalText = renderButton.innerHTML;
-            renderButton.disabled = true;
-            renderButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Çalışıyor...';
+            // Create progress bar
+            const progressContainer = UI.progress('render-progress', {
+                label: `Render ${quality.toUpperCase()} - %s`
+            });
+            document.querySelector('.flex.flex-wrap.gap-4.justify-center').insertBefore(
+                progressContainer,
+                document.querySelector('.neon-button')
+            );
 
-            // Simulate render process
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 2;
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    renderButton.disabled = false;
-                    renderButton.innerHTML = originalText;
+            // Use AI Render Engine
+            try {
+                const renderResult = await Render.render3D({
+                    model: 'selected-design',
+                    quality: quality,
+                    lighting: lighting
+                }, {
+                    quality: quality,
+                    format: 'png'
+                });
+
+                // Update progress
+                for (let i = 0; i <= 100; i += 5) {
+                    UI.updateProgress('render-progress', i, `Render ${i}% - ${quality.toUpperCase()}`);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                // Clean up progress
+                UI.removeProgress('render-progress');
+
+                // Show success with AI features
+                UI.notify('Render tamamlandı! Çıktılar bölümünden indirebilirsiniz', 'success');
+
+                // Auto redirect to export page
+                setTimeout(() => {
+                    showPage('export');
+                }, 1500);
+
+            } catch (error) {
+                UI.notify('Render işlemi başarısız oldu', 'error');
+                UI.removeProgress('render-progress');
+            }
+        }
 
                     showNotification('Render tamamlandı! Çıktılar bölümünden indirebilirsiniz', 'success');
 
@@ -1060,6 +1219,93 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 5000);
+        }
+
+        // Update metrics with AI analysis results
+        function updateMetricsWithAI(analysis) {
+            if (analysis.lightingScore) {
+                animateMetricValue('[data-metric="light"]', analysis.lightingScore);
+            }
+            if (analysis.rooms) {
+                const spaceEfficiency = Math.round(analysis.rooms.reduce((sum, room) => sum + room.efficiency, 0) / analysis.rooms.length);
+                animateMetricValue('[data-metric="space"]', spaceEfficiency);
+            }
+            if (analysis.energyEfficiency) {
+                animateMetricValue('[data-metric="energy"]', analysis.energyEfficiency);
+            }
+        }
+
+        // Animate single metric value
+        function animateMetricValue(selector, targetValue) {
+            const element = document.querySelector(selector);
+            if (element) {
+                let current = 0;
+                const increment = targetValue / 20;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= targetValue) {
+                        current = targetValue;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.round(current) + '%';
+                }, 50);
+            }
+        }
+
+        // Load AI-generated design variations
+        async function loadDesignVariationsAI(analysis) {
+            try {
+                const prompt = `${analysis.style} mimari tarzı, ${analysis.totalArea}m² alan`;
+                const variations = await AI.generate(prompt, {
+                    count: 3,
+                    style: analysis.style
+                });
+
+                const container = document.getElementById('designVariations');
+                if (container) {
+                    container.innerHTML = variations.map((variation, index) => `
+                        <div class="glass-card p-6 hover:scale-105 transition-transform cursor-pointer design-card ripple"
+                             data-design-id="${variation.id}"
+                             data-animate="fade-up"
+                             data-delay="${index * 200}"
+                             onclick="selectDesign('${variation.id}')">
+                            <div class="w-full h-40 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg mb-4 flex items-center justify-center">
+                                <img src="${variation.thumbnail}" alt="${variation.name}" class="w-full h-full object-cover rounded-lg">
+                            </div>
+                            <h4 class="text-lg font-semibold mb-2">${variation.name}</h4>
+                            <p class="text-gray-400 text-sm mb-4">${variation.description}</p>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="text-center">
+                                    <div class="text-blue-400 font-semibold">${variation.metrics.aesthetics}%</div>
+                                    <div class="text-gray-500">Estetik</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-purple-400 font-semibold">${variation.metrics.functionality}%</div>
+                                    <div class="text-gray-500">Fonksiyonel</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-green-400 font-semibold">${variation.metrics.sustainability}%</div>
+                                    <div class="text-gray-500">Sürdürülebilir</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-yellow-400 font-semibold">${variation.metrics.cost}</div>
+                                    <div class="text-gray-500">Maliyet</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Trigger animations
+                    setTimeout(() => {
+                        container.querySelectorAll('[data-animate]').forEach(el => {
+                            UI.animate(el);
+                        });
+                    }, 100);
+                }
+            } catch (error) {
+                console.error('Design variations loading error:', error);
+                loadDesignVariations(); // Fallback to default variations
+            }
         }
 
         // Initialize
